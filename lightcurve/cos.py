@@ -82,6 +82,7 @@ def extract(filename, **kwargs):
 
     verbosity = kwargs.get('verbosity', 0)
     step = kwargs.get('step', 1)
+    step = step - (step% 0.032) #step recalculated as a multiple of the base refresh rate (32 ms)
     wlim = kwargs.get('wlim', None)
     #-- If not specific wavlengths, truncate to good wavelengths
     #-- for each detector
@@ -144,7 +145,7 @@ def extract(filename, **kwargs):
 
     end = min(end, exptime)
 
-    all_steps = np.arange(start, end+step, step)
+    all_steps = np.float32(np.arange(start, end+step, step))
 
     if all_steps[-1] > end:
         truncate = True
@@ -226,7 +227,7 @@ def extract(filename, **kwargs):
     gross = gross
     flux = flux - background_flux
     background = background
-    mjd = hdu[1].header['EXPSTART'] + np.array(all_steps[:-1]) * SECOND_PER_MJD
+    mjd = hdu[1].header['EXPSTART'] + np.float_(np.array(all_steps[:-1])) * SECOND_PER_MJD
     bins = np.ones(len(gross)) * step
     times = all_steps[:-1]
 
